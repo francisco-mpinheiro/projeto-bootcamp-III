@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 [Nome do Projeto]
+# 🚀 Stockly
 
 ### Projeto desenvolvido para a matéria **BOOTCAMP III**
 
