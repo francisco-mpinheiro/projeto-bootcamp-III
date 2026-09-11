@@ -28,10 +28,12 @@
 
 | 👤 Nome | 🎓 RA |
 |---|---|
-| [Nome] | [RA] |
-| [Nome] | [RA] |
-| [Nome] | [RA] |
-| [Nome] | [RA] |
+| Erick Guilherme Mesquita Diniz | 22305289 |
+| Cauã Leite Sousa Paniagua | 22405235 |
+| Matheus Shiokawa Silva | 22305323 |
+| Marlon Giovanni Coelho Paganotto | 22301592 |
+| Mateus Cavalcante Rodrigues | 22303356 |
+| Francisco Matheus Pinheiro de Brito da Silva | 22303388 |
 
 ---
 
