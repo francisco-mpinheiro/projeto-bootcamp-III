@@ -1,4 +1,4 @@
-def generate_readme():
+
     content = """<div align="center">
   <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3h2bzIycm52bzN5MW00bXIxZXV0cmJzNXI3ZzhxbHVxaXBzY2o1aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L1R1tvI9svkIWwpVYr/giphy.gif" alt="Stock Management Animation" width="300" style="border-radius: 10px; margin-bottom: 20px;"/>
   
