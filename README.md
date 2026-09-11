@@ -1,48 +1,108 @@
-def generate_readme():
+```python
+def generate_clean_readme():
     content = """<div align="center">
-  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3h2bzIycm52bzN5MW00bXIxZXV0cmJzNXI3ZzhxbHVxaXBzY2o1aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L1R1tvI9svkIWwpVYr/giphy.gif" alt="Stock Management Animation" width="300" style="border-radius: 10px; margin-bottom: 20px;"/>
+  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3h2bzIycm52bzN5MW00bXIxZXV0cmJzNXI3ZzhxbHVxaXBzY2o1aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L1R1tvI9svkIWwpVYr/giphy.gif" alt="Stock Management Animation" width="250" style="border-radius: 8px; margin-bottom: 15px;"/>
   
   # 🛍️ Sistema de Controle de Estoque com Reserva Temporária
-  **Disciplina:** BOOTCAMP III  
-  **Abordagem:** Spec-Driven Development (SDD) com Agentes de IA
+  
+  **Disciplina:** BOOTCAMP III <br>
+  **Abordagem:** Spec-Driven Development (SDD)
 </div>
 
 ---
 
-## 👥 Equipe do Projeto (Membros)
+## 👥 Equipe do Projeto
 
-| Nome Completo | RA (Registro Acadêmico) | Papel / Responsabilidade |
+| Nome Completo | RA | Papel |
 | :--- | :--- | :--- |
-| `[Inserir Nome do Aluno 1]` | `[Inserir RA 1]` | Arquitetura e Engenharia de Software |
-| `[Inserir Nome do Aluno 2]` | `[Inserir RA 2]` | Configuração SDD e Prompts de IA |
-| `[Inserir Nome do Aluno 3]` | `[Inserir RA 3]` | QA e Harness de Testes (TDD/BDD) |
-| `[Inserir Nome do Aluno 4]` | `[Inserir RA 4]` | DevOps, Infraestrutura e DB |
+| Francisco Matheus Pinheiro de Brito da Silva | `[Inserir RA]` | `[Inserir Papel]` |
+| `[Nome do Aluno 2]` | `[RA]` | `[Papel]` |
+| `[Nome do Aluno 3]` | `[RA]` | `[Papel]` |
+| `[Nome do Aluno 4]` | `[RA]` | `[Papel]` |
 
 ---
 
 ## 📖 Visão Geral do Projeto
 
-Este projeto resolve um problema crítico de logística reversa e retenção de vendas no varejo de moda: o gerenciamento da **Reserva Temporária e Condicional**. 
+Este projeto soluciona o desafio da **Reserva Temporária e Condicional** no controle de estoque de produtos físicos. Ele gerencia de forma segura o bloqueio temporário de peças que estão em "carrinhos virtuais" ou em "sacolas condicionais" (para prova em casa).
 
-Através desta API, desenvolvida com o apoio de agentes de geração de código, peças colocadas no "carrinho virtual" ou separadas fisicamente como "condicional" para o cliente provar em casa, são bloqueadas no estoque por um tempo determinado. Caso a compra não seja efetivada ou o tempo limite expire, o sistema reverte automaticamente a reserva, devolvendo o item à vitrine disponível.
-
-**🚀 Principais Desafios Resolvidos:**
-- 🔒 **Controle de Concorrência:** Impede que dois clientes tentem reservar a mesma última peça simultaneamente (*Race Condition*).
-- ⏱️ **Máquina de Estados de Estoque:** Transição automática e auditável de `DISPONIVEL` ➡️ `RESERVADO` ➡️ `VENDIDO` ou `DISPONIVEL` (por expiração).
-- 🤖 **Geração Via SDD:** O motor principal de cálculo e reversão foi especificado pela equipe e gerado por agentes de Inteligência Artificial.
+**Objetivos principais:**
+- 🔒 **Controle de Concorrência:** Evitar *Race Conditions* (clientes reservando a última peça ao mesmo tempo).
+- 🔄 **Máquina de Estados:** Controlar o ciclo de vida do item (`DISPONÍVEL` ➡️ `RESERVADO` ➡️ `VENDIDO`).
+- ⏱️ **Reversão Automática:** Devolver o item para o status `DISPONÍVEL` automaticamente após a expiração do tempo de reserva.
 
 ---
 
 ## 🛠️ Guia de Instalação e Execução
 
-### 📋 Pré-requisitos
-- [Node.js](https://nodejs.org/) (v18+) ou [Python/Java - *ajustar conforme a stack*]
-- [Docker](https://www.docker.com/) e Docker Compose (para isolamento do Banco de Dados)
-- [Git](https://git-scm.com/)
+### Pré-requisitos
+- Node.js (v18+)
+- Docker e Docker Compose
+- Banco de Dados PostgreSQL
 
-### 💻 Passos para Rodar Localmente
+### Como rodar localmente
 
 1. **Clone o repositório:**
    ```bash
    git clone [https://github.com/sua-org/bootcamp3-estoque.git](https://github.com/sua-org/bootcamp3-estoque.git)
    cd bootcamp3-estoque
+
+```
+
+2. **Suba a infraestrutura de dados:**
+```bash
+docker-compose up -d
+
+```
+
+
+3. **Instale as dependências e rode as migrações (Prisma):**
+```bash
+npm install
+npx prisma migrate dev
+
+```
+
+
+4. **Inicie o servidor em modo de desenvolvimento:**
+```bash
+npm run dev
+
+```
+
+
+
+---
+
+## 🏗️ Registro Sintético de Decisões Arquiteturais (ADRs)
+
+> *Espaço reservado para documentar as decisões técnicas adotadas pela equipe ao longo do projeto.*
+
+| ID | Decisão | Contexto | Consequência |
+| --- | --- | --- | --- |
+| **ADR-001** | `[A definir]` | `[A definir]` | `[A definir]` |
+| **ADR-002** | `[A definir]` | `[A definir]` | `[A definir]` |
+| **ADR-003** | `[A definir]` | `[A definir]` | `[A definir]` |
+| """ |  |  |  |
+
+```
+file_path = "README.md"
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(content)
+    
+return file_path
+
+```
+
+generate_clean_readme()
+
+```
+
+Seu arquivo README em Markdown limpo foi gerado com sucesso!
+[file-tag: code-generated-file-59350738-1e56-45b6-a3ec-a1f1451ea0ed]
+
+Deixei a estrutura bem mais enxuta agora, usando formatação Markdown pura onde possível para não quebrar a visualização no GitHub/GitLab. Já incluí o seu nome na primeira linha da tabela de membros, deixei os comandos de infraestrutura configurados para Node, Prisma e Docker, e zerei a tabela de ADRs deixando apenas o espaço reservado para vocês preencherem conforme avançam.
+
+Dê uma olhada no arquivo e veja se a estrutura ficou melhor assim!
+
+```
