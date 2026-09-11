@@ -6,9 +6,7 @@
 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 
-<img src="[LINK_DO_GIF_OU_IMAGEM]" width="280" alt="banner do projeto"/>
-
-*[Espaço reservado para GIF/imagem de destaque do projeto]*
+<img src="./assests/banner.jpg" width="280" alt="banner do projeto"/>
 
 </div>
 
