@@ -1,122 +1,201 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useEffect, useCallback } from 'react';
+import { api } from './services/api';
+import type { Product, DashboardSummary, CreateProductInput, CreateMovementInput } from './types';
+import { Header } from './components/Header';
+import { DashboardKPIs } from './components/DashboardKPIs';
+import { AlertBanner } from './components/AlertBanner';
+import { ProductList } from './components/ProductList';
+import { ProductModal } from './components/ProductModal';
+import { MovementModal } from './components/MovementModal';
+import { MovementHistoryModal } from './components/MovementHistoryModal';
+import { Toast } from './components/Toast';
+import type { ToastMessage } from './components/Toast';
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('');
+
+  // Modals state
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
+  const [selectedMovementProduct, setSelectedMovementProduct] = useState<Product | null>(null);
+
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
+  // Toast notification
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+
+  const showToast = (type: 'success' | 'alert' | 'error', title: string, message?: string) => {
+    setToast({
+      id: Math.random().toString(),
+      type,
+      title,
+      message,
+    });
+  };
+
+  // Fetch all initial data
+  const loadData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const [productsData, summaryData] = await Promise.all([
+        api.getProducts(),
+        api.getDashboardSummary(),
+      ]);
+      setProducts(productsData);
+      setSummary(summaryData);
+    } catch (err: unknown) {
+      console.error('Erro ao carregar dados do Stockly:', err);
+      showToast(
+        'error',
+        'Falha de comunicação',
+        'Não foi possível conectar ao servidor do backend. Verifique se o servidor está ativo na porta 3001.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Product CRUD Handlers
+  const handleOpenNewProduct = () => {
+    setEditingProduct(null);
+    setIsProductModalOpen(true);
+  };
+
+  const handleOpenEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setIsProductModalOpen(true);
+  };
+
+  const handleSaveProduct = async (data: CreateProductInput) => {
+    if (editingProduct) {
+      await api.updateProduct(editingProduct.id, data);
+      showToast('success', 'Produto atualizado', `${data.name} foi atualizado com sucesso.`);
+    } else {
+      await api.createProduct(data);
+      showToast('success', 'Produto cadastrado', `${data.name} foi adicionado ao estoque.`);
+    }
+    await loadData();
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    const product = products.find((p) => p.id === id);
+    const confirmDelete = window.confirm(
+      `Deseja realmente excluir o produto "${product?.name || id}"? Todas as movimentações deste produto também serão removidas.`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await api.deleteProduct(id);
+      showToast('success', 'Produto removido', 'O item foi excluído do inventário.');
+      await loadData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao excluir produto.';
+      showToast('error', 'Falha na exclusão', msg);
+    }
+  };
+
+  // Movement Handlers
+  const handleOpenMovement = (product?: Product | null) => {
+    setSelectedMovementProduct(product || null);
+    setIsMovementModalOpen(true);
+  };
+
+  const handleRegisterMovement = async (data: CreateMovementInput) => {
+    const result = await api.registerMovement(data);
+    const isExit = data.type === 'EXIT';
+    const prodName = result.product.name;
+
+    if (result.alertTriggered) {
+      // Dispara Toast de Alerta destacado se atingir ou ficar abaixo do ponto de reposição!
+      showToast(
+        'alert',
+        '⚠️ Ponto de Reposição Atingido!',
+        `O produto "${prodName}" atingiu ${result.product.currentStock} ${result.product.unit} (estoque mínimo: ${result.product.minStock}). Necessita reposição urgente!`
+      );
+    } else {
+      showToast(
+        'success',
+        isExit ? 'Saída registrada' : 'Entrada registrada',
+        `${data.quantity} ${result.product.unit} de "${prodName}". Novo estoque: ${result.product.currentStock}.`
+      );
+    }
+
+    await loadData();
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 16px' }}>
+      {/* Header */}
+      <Header
+        onOpenNewProduct={handleOpenNewProduct}
+        onOpenMovement={() => handleOpenMovement(null)}
+        onOpenHistory={() => setIsHistoryModalOpen(true)}
+        totalAlerts={summary?.metrics.totalAlerts || 0}
+      />
 
-      <div className="ticks"></div>
+      {/* Low Stock Urgent Alert Banner */}
+      {summary && summary.alertProducts.length > 0 && (
+        <AlertBanner
+          alertProducts={summary.alertProducts}
+          onQuickRestock={(product) => handleOpenMovement(product)}
+        />
+      )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {/* KPI Metrics Summary Cards */}
+      {summary && (
+        <DashboardKPIs
+          metrics={summary.metrics}
+          onFilterStatus={(status) => setStatusFilter(status)}
+          activeStatusFilter={statusFilter}
+        />
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* Main Inventory Product Table */}
+      <ProductList
+        products={products}
+        isLoading={isLoading}
+        onMovement={(product) => handleOpenMovement(product)}
+        onEdit={handleOpenEditProduct}
+        onDelete={handleDeleteProduct}
+        onNewProduct={handleOpenNewProduct}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
+
+      {/* Modals */}
+      <ProductModal
+        isOpen={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        onSave={handleSaveProduct}
+        editingProduct={editingProduct}
+      />
+
+      <MovementModal
+        isOpen={isMovementModalOpen}
+        onClose={() => setIsMovementModalOpen(false)}
+        products={products}
+        selectedProduct={selectedMovementProduct}
+        onRegister={handleRegisterMovement}
+      />
+
+      <MovementHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+      />
+
+      {/* Floating Notification */}
+      <Toast toast={toast} onClose={() => setToast(null)} />
+    </div>
+  );
 }
 
-export default App
+export default App;

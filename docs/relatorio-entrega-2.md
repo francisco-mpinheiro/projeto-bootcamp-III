@@ -8,7 +8,7 @@
 | 👤 Nome Completo | 🎓 RA |
 |---|---|
 | Erick Guilherme Mesquita Diniz | 22305289 |
-| Cauã Leite Sousa Paniagua | 22405235 |
+| Cauã Leite Sousa Paniagua | 22305235 |
 | Matheus Shiokawa Silva | 22305323 |
 | Marlon Giovanni Coelho Paganotto | 22301592 |
 | Mateus Cavalcante Rodrigues | 22303356 |
@@ -40,8 +40,10 @@ O fluxo de desenvolvimento adotou estritamente o modelo de **Feature Branches**:
    - Revisão e aprovação formal (Code Review) realizada por pelo menos um membro par da equipe.
 
 #### 🔗 Links de Pull Requests Relevantes:
-- **PR #1 (Backend & Test Harness):** [https://github.com/francisco-mpinheiro/projeto-bootcamp-III/pull/1](https://github.com/francisco-mpinheiro/projeto-bootcamp-III/pulls) (ou branch `feature/backend-api`)
-  - *Foco do Review:* Validação do isolamento de porta no Docker, transações atômicas no Prisma e cobertura de testes de borda.
+- **PR #1 (Backend, Infraestrutura & Test Harness):** [https://github.com/francisco-mpinheiro/projeto-bootcamp-III/pull/1](https://github.com/francisco-mpinheiro/projeto-bootcamp-III/pull/1)
+  - *Foco do Review:* Validação do isolamento de porta no Docker (`5433`), transações atômicas no Prisma e cobertura de testes de borda com 100% de aprovação.
+- **PR #2 (Frontend React & Ponto de Reposição UI):** [https://github.com/francisco-mpinheiro/projeto-bootcamp-III/pull/2](https://github.com/francisco-mpinheiro/projeto-bootcamp-III/pulls) (branch `feature/frontend-stockly-ui`)
+  - *Foco do Review:* Interface responsiva com dashboard de métricas, banner de alerta de reposição crítico, modal dinâmico de movimentações com bloqueio de saldo negativo e auditoria de histórico.
 
 ---
 
