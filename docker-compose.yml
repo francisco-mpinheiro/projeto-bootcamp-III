@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: stockly_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: stockly_user
+      POSTGRES_PASSWORD: stockly_password
+      POSTGRES_DB: stockly_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - stockly_pgdata:/var/lib/postgresql/data
+
+volumes:
+  stockly_pgdata:
