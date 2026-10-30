@@ -4,7 +4,8 @@
 
 ### Projeto desenvolvido para a matéria **BOOTCAMP III**
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-v1.0.0%20release-success)
+![Tests](https://img.shields.io/badge/tests-13%2F13%20passing-brightgreen)
 
 <img src="./assests/banner.jpg" width="280" alt="banner do projeto"/>
 
@@ -16,8 +17,11 @@
 
 - [👥 Membros do Grupo](#-membros-do-grupo)
 - [📌 Visão Geral do Projeto](#-visão-geral-do-projeto)
+- [🏛️ Arquitetura e Fluxo da Aplicação](#️-arquitetura-e-fluxo-da-aplicação)
 - [🛠️ Tecnologias Utilizadas](#️-tecnologias-utilizadas)
 - [⚙️ Guia de Instalação e Execução](#️-guia-de-instalação-e-execução)
+- [🧪 Testes e Cobertura](#-testes-e-cobertura)
+- [📚 Documentação da Entrega Final](#-documentação-da-entrega-final)
 - [🧱 Registro de Decisões Arquiteturais (ADRs)](#-registro-de-decisões-arquiteturais-adrs)
 
 ---
@@ -49,6 +53,7 @@
   - [x] Histórico de movimentações por produto
   - [x] Painel de visão geral do estoque (KPIs e resumo analítico)
   - [x] Test harness automatizado com 100% de aprovação (Jest + Supertest)
+  - [x] Empacotamento Docker Compose (Postgres + API + Frontend)
 
 ---
 
@@ -56,7 +61,7 @@
 
 ```mermaid
 graph TD
-    User([👤 Usuário / Operador]) -->|Acessa Interface| Front[🖥️ Frontend React + Vite]
+    User([👤 Usuário / Operador]) -->|Acessa Interface| Front[🖥️ Frontend React + Vite / Nginx]
     Front -->|Requisições REST| API[⚙️ Backend Node.js / Express]
     API -->|Validação de Entrada| Zod[🛡️ Zod Schema Validation]
     Zod -->|Regras de Ponto de Reposição| Services[💼 Camada de Serviços]
@@ -107,12 +112,12 @@ sequenceDiagram
 
 </div>
 
-- **Frontend:** React (Vite + TypeScript)
+- **Frontend:** React (Vite + TypeScript) + Nginx em produção
 - **Backend:** Node.js (Express)
 - **ORM:** Prisma 6.4.1
 - **Banco de dados:** PostgreSQL 16
-- **Testes Automatizados:** Jest + Supertest (13 testes, 100% de aprovação)
-- **Infraestrutura:** Docker & Docker Compose
+- **Testes Automatizados:** Jest + Supertest (13 testes, 100% de aprovação) + relatório de cobertura
+- **Infraestrutura:** Docker & Docker Compose (`postgres`, `api`, `web`, profile `test`)
 
 ---
 
@@ -120,7 +125,7 @@ sequenceDiagram
 
 ### ✅ Pré-requisitos
 
-- Node.js (v18+)
+- Node.js (v18+) — necessário apenas no modo desenvolvimento local
 - Docker e Docker Compose instalados e em execução
 
 ### 📥 1. Clonar o repositório
@@ -130,15 +135,54 @@ git clone https://github.com/francisco-mpinheiro/projeto-bootcamp-III.git
 cd projeto-bootcamp-III
 ```
 
-### 🐳 2. Subir o Banco de Dados PostgreSQL no Docker
+### 🐳 2. Execução completa com Docker (recomendado)
 
-O arquivo `docker-compose.yml` mapeia o banco na porta **5433** (para não conflitar com portas locais padrão):
+Sobe **PostgreSQL + API + Frontend** com um único comando:
 
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
 
-### 📦 3. Configurar e Inicializar o Backend
+Após o build:
+
+| Serviço | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API / Health | http://localhost:3001/api/health |
+| PostgreSQL | `localhost:5433` |
+
+Para popular dados iniciais (opcional):
+
+```bash
+docker compose exec api npm run seed
+```
+
+Para derrubar o ambiente:
+
+```bash
+docker compose down
+```
+
+### 🧪 3. Harness de testes via Docker
+
+```bash
+docker compose up -d postgres
+docker compose --profile test run --rm test
+```
+
+O serviço `test` executa `npm run test:coverage` contra o banco conteinerizado.
+
+### 💻 4. Alternativa — desenvolvimento local
+
+#### 4.1 Banco de dados
+
+```bash
+docker compose up -d postgres
+```
+
+O `docker-compose.yml` mapeia o banco na porta **5433**.
+
+#### 4.2 Backend
 
 ```bash
 cd backend
@@ -153,21 +197,53 @@ npx prisma db push
 # Popular com dados de teste (opcional)
 npm run seed
 
-# Executar os testes automatizados (deve reportar 100% de aprovação)
-npm test
-
 # Iniciar o servidor em modo de desenvolvimento
 npm run dev
 ```
-> O backend estará disponível em: `http://localhost:3001` (Health check: `http://localhost:3001/api/health`)
 
-### 💻 4. Configurar e Inicializar o Frontend
+> Backend em: `http://localhost:3001` (Health: `http://localhost:3001/api/health`)
+
+#### 4.3 Frontend
 
 ```bash
 cd ../frontend
 npm install
 npm run dev
 ```
+
+> Frontend em: `http://localhost:3000` (proxy Vite de `/api` → `http://localhost:3001`)
+
+---
+
+## 🧪 Testes e Cobertura
+
+```bash
+cd backend
+npm test                 # 13 testes — deve reportar 100% de aprovação
+npm run test:coverage    # mesma suíte + relatório em backend/coverage/
+```
+
+Relatórios gerados por `test:coverage`:
+
+- Terminal: resumo textual (`Coverage summary`)
+- HTML: `backend/coverage/index.html`
+- LCOV: `backend/coverage/lcov.info`
+
+Arquivos da suíte:
+
+- `backend/tests/product.test.js` (6 casos)
+- `backend/tests/movement.test.js` (6 casos)
+- `backend/tests/dashboard.test.js` (1 caso)
+
+---
+
+## 📚 Documentação da Entrega Final
+
+| Documento | Caminho |
+|---|---|
+| SDD As-Built (especificação definitiva) | [`docs/sdd-as-built.md`](./docs/sdd-as-built.md) |
+| Base do PDF de encerramento | [`docs/encerramento-entrega-final.md`](./docs/encerramento-entrega-final.md) |
+| Relatório técnico-ético (Entrega 2) | [`docs/relatorio-entrega-2.md`](./docs/relatorio-entrega-2.md) |
 
 ---
 
@@ -193,8 +269,14 @@ npm run dev
 - **Status:** ✅ Aceita
 - **Consequências:** Elimina conflitos de rede no ambiente de desenvolvimento da equipe e blinda a API contra payloads maliciosos, números negativos inválidos e tipos inconsistentes.
 
+### ADR 004 — Empacotamento fullstack via Docker Compose
+- **Contexto:** A entrega final exige ambiente padronizado e reproduzível, com execução simples da aplicação e do harness de testes.
+- **Decisão:** Incluir serviços `api` e `web` no Compose (além do `postgres`) e um profile `test` que executa a suíte com cobertura.
+- **Status:** ✅ Aceita
+- **Consequências:** Avaliadores e integrantes sobem o produto com `docker compose up --build -d` e validam testes com `docker compose --profile test run --rm test`.
+
 ---
 
 <div align="center">
-  Feito para a disciplina BOOTCAMP III
+  Feito para a disciplina BOOTCAMP III — Release v1.0.0
 </div>
