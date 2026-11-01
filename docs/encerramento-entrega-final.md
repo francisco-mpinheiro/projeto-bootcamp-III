@@ -2,8 +2,7 @@
 
 **Projeto:** Stockly  
 **Disciplina:** BOOTCAMP III  
-**Release alvo:** [v1.0.0](https://github.com/francisco-mpinheiro/projeto-bootcamp-III/releases/tag/v1.0.0)  
-*(Atualizar o link após publicar a release no GitHub.)*
+**Release alvo:** [v1.0.0](https://github.com/francisco-mpinheiro/projeto-bootcamp-III/releases/tag/v1.0.0)
 
 > Este arquivo é a base textual do PDF a ser enviado na Sala Online.  
 > Preencha os campos marcados com `[PREENCHER]` antes de exportar para PDF.
@@ -13,9 +12,10 @@
 ## 1. Link da Release Oficial
 
 - **Repositório:** https://github.com/francisco-mpinheiro/projeto-bootcamp-III  
-- **Release v1.0.0:** `[PREENCHER — colar URL da release após publicar]`  
+- **Release v1.0.0:** https://github.com/francisco-mpinheiro/projeto-bootcamp-III/releases/tag/v1.0.0  
 - **Tag:** `v1.0.0`  
-- **Branch base:** `main`
+- **Branch base:** `main`  
+- **Commit:** `43eb3e4` (Merge pull request #3 — `entrega-final`)
 
 ---
 
@@ -121,11 +121,11 @@ A especificação técnica definitiva está em `docs/sdd-as-built.md`, refletind
 
 ## 7. Checklist final da equipe
 
-- [ ] `node_modules` removido do Git e push feito  
-- [ ] Testes 13/13 passando + coverage gerado  
-- [ ] PR `entrega-final` → `main` aprovado e mergeado  
-- [ ] Tag e Release `v1.0.0` publicadas no GitHub  
-- [ ] SDD As-Built revisado pela equipe  
+- [x] `node_modules` removido do Git e push feito  
+- [x] Testes 13/13 passando + coverage gerado  
+- [x] PR `entrega-final` → `main` aprovado e mergeado  
+- [x] Tag e Release `v1.0.0` publicadas no GitHub  
+- [x] SDD As-Built revisado pela equipe  
 - [ ] Vídeo publicado e link colado neste documento  
 - [ ] Retrospectiva preenchida  
 - [ ] PDF exportado e enviado na Sala Online  
